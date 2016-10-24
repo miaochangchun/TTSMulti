@@ -1,6 +1,7 @@
 package com.example.sinovoice.ttsutil;
 
 import android.content.Context;
+import android.util.Log;
 
 import com.sinovoice.hcicloudsdk.android.tts.player.TTSPlayer;
 import com.sinovoice.hcicloudsdk.common.tts.TtsConfig;
@@ -12,10 +13,11 @@ import com.sinovoice.hcicloudsdk.player.TTSPlayerListener;
  * Created by miaochangchun on 2016/10/24.
  */
 public class HciCloudTtsHelper {
-    private static HciCloudTtsHelper mHciCloudTtsHelper;
+    private static final String TAG = HciCloudTtsHelper.class.getSimpleName();
+    private static HciCloudTtsHelper mHciCloudTtsHelper = null;
     private TTSPlayer mTtsPlayer;
-    private HciCloudTtsHelper(){
 
+    private HciCloudTtsHelper(){
     }
 
     /**
@@ -33,6 +35,7 @@ public class HciCloudTtsHelper {
         mTtsPlayer = new TTSPlayer();
         String strConfig = getTtsInitParam(context);
         mTtsPlayer.init(strConfig, new TTSEventProcess());
+        Log.d(TAG, "initTtsPlayer Success.");
     }
 
     /**
@@ -42,6 +45,7 @@ public class HciCloudTtsHelper {
      */
     public void playTtsPlayer(String text, String capkey) {
         String strConfig = getTtsSynthConfig(capkey);
+        Log.d(TAG, "mTtsPlayer = " + mTtsPlayer);
         if (mTtsPlayer.getPlayerState() == TTSCommonPlayer.PLAYER_STATE_PLAYING || mTtsPlayer.getPlayerState() == TTSCommonPlayer.PLAYER_STATE_PAUSE) {
             mTtsPlayer.stop();
         }
@@ -100,7 +104,10 @@ public class HciCloudTtsHelper {
         String dataPath = context.getFilesDir().getAbsolutePath().replace("files", "lib");
         ttsInitParam.addParam(TtsInitParam.PARAM_KEY_DATA_PATH, dataPath);
         ttsInitParam.addParam(TtsInitParam.PARAM_KEY_FILE_FLAG, "android_so");
-        ttsInitParam.addParam(TtsInitParam.PARAM_KEY_INIT_CAP_KEYS, "");
+        ttsInitParam.addParam(TtsInitParam.PARAM_KEY_INIT_CAP_KEYS, "tts.cloud.hui;tts.cloud.kate;tts.cloud.misaki;tts.cloud.yumi;" +
+                "tts.cloud.anna;tts.cloud.thomas;tts.cloud.violeta;tts.cloud.milena;tts.cloud.vera;tts.cloud.narisa;" +
+                "tts.cloud.aylin;tts.cloud.claire;tts.cloud.melina;tts.cloud.maged;tts.cloud.javier;tts.cloud.damayanti;" +
+                "tts.cloud.xiaojie;tts.cloud.uyghur");
         return ttsInitParam.getStringConfig();
     }
 

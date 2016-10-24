@@ -8,8 +8,6 @@ import com.sinovoice.hcicloudsdk.api.HciCloudSys;
 import com.sinovoice.hcicloudsdk.common.AuthExpireTime;
 import com.sinovoice.hcicloudsdk.common.HciErrorCode;
 import com.sinovoice.hcicloudsdk.common.InitParam;
-import com.sinovoice.hcicloudsdk.common.tts.TtsInitParam;
-import com.sinovoice.hcicloudsdk.common.utils.HciConst;
 
 import java.io.File;
 import java.text.SimpleDateFormat;
@@ -21,10 +19,9 @@ import java.util.Locale;
  */
 public class HciCloudSysHelper {
     private static final String TAG = HciCloudSysHelper.class.getSimpleName();
-    private static HciCloudSysHelper mHciCloudSysHelper;
+    private static HciCloudSysHelper mHciCloudSysHelper = null;
 
     private HciCloudSysHelper(){
-
     }
 
     public static HciCloudSysHelper getInstance() {
@@ -99,7 +96,7 @@ public class HciCloudSysHelper {
         //灵云云服务的接口地址，此项必填
         initParam.addParam(InitParam.AuthParam.PARAM_KEY_DEVELOPER_KEY, "712ddd892cf9163e6383aa169e0454e3");
         //灵云云服务的接口地址，此项必填
-        initParam.addParam(InitParam.AuthParam.PARAM_KEY_AUTO_CLOUD_AUTH, "http://test.api.hcicloud.com:8888");
+        initParam.addParam(InitParam.AuthParam.PARAM_KEY_CLOUD_URL, "http://test.api.hcicloud.com:8888");
         String authPath = context.getFilesDir().getAbsolutePath();
         //授权文件所在路径，此项必填
         initParam.addParam(InitParam.AuthParam.PARAM_KEY_AUTH_PATH, authPath);
