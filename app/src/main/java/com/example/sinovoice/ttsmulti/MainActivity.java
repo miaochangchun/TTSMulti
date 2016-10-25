@@ -30,7 +30,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     private ArrayAdapter<String> arr_adapter;
     private HciCloudSysHelper mHciCloudSysHelper;
     private HciCloudTtsHelper mHciCloudTtsHelper;
-    private String capkey = "tts.cloud.hui";
+    private String capkey;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -67,6 +67,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         //设置监听事件
         mySpinner.setOnItemSelectedListener(new mySpinnerOnItemSelectListener());
 
+        //按钮初始化和设置监听
         btnPlay = (Button) findViewById(R.id.btnPlay);
         btnPause = (Button) findViewById(R.id.btnPause);
         btnResume = (Button) findViewById(R.id.btnResume);

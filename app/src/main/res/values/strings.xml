@@ -6,4 +6,5 @@
     <string name="resume">恢复播放</string>
     <string name="stop">停止播放</string>
     <string name="selectLanguage">选择语种：</string>
+    <string name="titleSpinner">选择语种：</string>
 </resources>
