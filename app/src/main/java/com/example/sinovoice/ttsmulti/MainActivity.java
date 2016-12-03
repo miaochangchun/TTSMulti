@@ -9,7 +9,9 @@ import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.Spinner;
+import android.widget.Toast;
 
+import com.example.sinovoice.ttsutil.ConfigUtil;
 import com.example.sinovoice.ttsutil.HciCloudSysHelper;
 import com.example.sinovoice.ttsutil.HciCloudTtsHelper;
 import com.sinovoice.hcicloudsdk.common.HciErrorCode;
@@ -31,33 +33,58 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     private HciCloudSysHelper mHciCloudSysHelper;
     private HciCloudTtsHelper mHciCloudTtsHelper;
     private String capkey;
+    //把所有需要使用的能力都给初始化了
+    private String initCapkeys = ConfigUtil.CAP_KEY_TTS_CLOUD_WANGJING + ";" +
+            ConfigUtil.CAP_KEY_TTS_CLOUD_SERENA + ";" +
+            ConfigUtil.CAP_KEY_TTS_CLOUD_KYOKO + ";" +
+            ConfigUtil.CAP_KEY_TTS_CLOUD_NARAE + ";" +
+            ConfigUtil.CAP_KEY_TTS_CLOUD_ANNA + ";" +
+            ConfigUtil.CAP_KEY_TTS_CLOUD_THOMAS + ";" +
+            ConfigUtil.CAP_KEY_TTS_CLOUD_MONICA + ";" +
+            ConfigUtil.CAP_KEY_TTS_CLOUD_MILENA + ";" +
+            ConfigUtil.CAP_KEY_TTS_CLOUD_VERA + ";" +
+            ConfigUtil.CAP_KEY_TTS_CLOUD_NARISA + ";" +
+            ConfigUtil.CAP_KEY_TTS_CLOUD_AYLIN + ";" +
+            ConfigUtil.CAP_KEY_TTS_CLOUD_CLAIRE + ";" +
+            ConfigUtil.CAP_KEY_TTS_CLOUD_MELINA + ";" +
+            ConfigUtil.CAP_KEY_TTS_CLOUD_MAGED + ";" +
+            ConfigUtil.CAP_KEY_TTS_CLOUD_JAVIER + ";" +
+            ConfigUtil.CAP_KEY_TTS_CLOUD_DAMAYANTI + ";" +
+            ConfigUtil.CAP_KEY_TTS_CLOUD_XIAOJIE + ";" +
+            ConfigUtil.CAP_KEY_TTS_CLOUD_UYGHUR;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+        
+        initView();
+        initSinovoice();
+    }
+
+    private void initView() {
         text = (EditText) findViewById(R.id.editText);
 
         mySpinner = (Spinner) findViewById(R.id.mySpinner);
         multiLanguage = new ArrayList<String>();
-        multiLanguage.add("汉语");        //tts.cloud.hui
-        multiLanguage.add("英语");        //tts.cloud.kate
-        multiLanguage.add("日语");        //tts.cloud.misaki
-        multiLanguage.add("韩语");        //tts.cloud.yumi
-        multiLanguage.add("德语");        //tts.cloud.anna
-        multiLanguage.add("法语");        //tts.cloud.thomas
-        multiLanguage.add("西班牙语");      //tts.cloud.violeta
-        multiLanguage.add("俄罗斯语");       //tts.cloud.milena
-        multiLanguage.add("葡萄牙语");       //tts.cloud.vera
-        multiLanguage.add("泰语");           //tts.cloud.narisa
-        multiLanguage.add("土耳其语");        //tts.cloud.aylin
-        multiLanguage.add("荷兰语");          //tts.cloud.claire
-        multiLanguage.add("希腊语");          //tts.cloud.melina
-        multiLanguage.add("阿拉伯语");        //tts.cloud.maged
-        multiLanguage.add("墨西哥语");        //tts.cloud.javier
-        multiLanguage.add("印度尼西亚语");    //tts.cloud.damayanti
-        multiLanguage.add("广东话");       //tts.cloud.xiaojie
-        multiLanguage.add("维吾尔语");      //tts.cloud.uyghur
+        multiLanguage.add("汉语");
+        multiLanguage.add("英语");
+        multiLanguage.add("日语");
+        multiLanguage.add("韩语");
+        multiLanguage.add("德语");
+        multiLanguage.add("法语");
+        multiLanguage.add("西班牙语");
+        multiLanguage.add("俄罗斯语");
+        multiLanguage.add("葡萄牙语");
+        multiLanguage.add("泰语");
+        multiLanguage.add("土耳其语");
+        multiLanguage.add("荷兰语");
+        multiLanguage.add("希腊语");
+        multiLanguage.add("阿拉伯语");
+        multiLanguage.add("墨西哥语");
+        multiLanguage.add("印度尼西亚语");
+        multiLanguage.add("广东话");
+        multiLanguage.add("维吾尔语");
         //适配器
         arr_adapter= new ArrayAdapter<String>(this, android.R.layout.simple_spinner_item, multiLanguage);
         //设置样式
@@ -77,15 +104,24 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         btnPause.setOnClickListener(this);
         btnResume.setOnClickListener(this);
         btnStop.setOnClickListener(this);
+    }
 
+    /**
+     * 初始化灵云系统和播放器
+     */
+    private void initSinovoice() {
         mHciCloudSysHelper = HciCloudSysHelper.getInstance();
         mHciCloudTtsHelper = HciCloudTtsHelper.getInstance();
-        int errCode = mHciCloudSysHelper.init(this);
-        if (errCode != HciErrorCode.HCI_ERR_NONE) {
-            Log.e(TAG, "mHciCloudSysHelper.init failed and return " + errCode);
+        int errorCode = mHciCloudSysHelper.init(this);
+        if (errorCode != HciErrorCode.HCI_ERR_NONE) {
+            Toast.makeText(this, "系统初始化失败，错误码=" + errorCode, Toast.LENGTH_SHORT).show();
             return;
         }
-        mHciCloudTtsHelper.initTtsPlayer(this);
+        boolean bool = mHciCloudTtsHelper.initTtsPlayer(this, initCapkeys);
+        if (bool == false) {
+            Toast.makeText(this, "播放器初始化失败", Toast.LENGTH_SHORT).show();
+            return;
+        }
     }
 
 
@@ -109,6 +145,17 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         }
     }
 
+    @Override
+    protected void onDestroy() {
+        if (mHciCloudTtsHelper != null) {
+            mHciCloudTtsHelper.releaseTtsPlayer();
+        }
+        if (mHciCloudSysHelper != null) {
+            mHciCloudSysHelper.release();
+        }
+        super.onDestroy();
+    }
+
     /**
      * Spinner的响应事件是OnItemSelectedListener ,千万不要写出onItemClickListener,否则直接报错
      */
@@ -118,58 +165,58 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
             switch (position) {
                 case 0:
-                    capkey = "tts.cloud.hui";
+                    capkey = ConfigUtil.CAP_KEY_TTS_CLOUD_WANGJING;
                     break;
                 case 1:
-                    capkey = "tts.cloud.kate";
+                    capkey = ConfigUtil.CAP_KEY_TTS_CLOUD_SERENA;
                     break;
                 case 2:
-                    capkey = "tts.cloud.misaki";
+                    capkey = ConfigUtil.CAP_KEY_TTS_CLOUD_KYOKO;
                     break;
                 case 3:
-                    capkey = "tts.cloud.yumi";
+                    capkey = ConfigUtil.CAP_KEY_TTS_CLOUD_NARAE;
                     break;
                 case 4:
-                    capkey = "tts.cloud.anna";
+                    capkey = ConfigUtil.CAP_KEY_TTS_CLOUD_ANNA;
                     break;
                 case 5:
-                    capkey = "tts.cloud.thomas";
+                    capkey = ConfigUtil.CAP_KEY_TTS_CLOUD_THOMAS;
                     break;
                 case 6:
-                    capkey = "tts.cloud.violeta";
+                    capkey = ConfigUtil.CAP_KEY_TTS_CLOUD_MONICA;
                     break;
                 case 7:
-                    capkey = "tts.cloud.milena";
+                    capkey = ConfigUtil.CAP_KEY_TTS_CLOUD_MILENA;
                     break;
                 case 8:
-                    capkey = "tts.cloud.vera";
+                    capkey = ConfigUtil.CAP_KEY_TTS_CLOUD_VERA;
                     break;
                 case 9:
-                    capkey = "tts.cloud.narisa";
+                    capkey = ConfigUtil.CAP_KEY_TTS_CLOUD_NARISA;
                     break;
                 case 10:
-                    capkey = "tts.cloud.aylin";
+                    capkey = ConfigUtil.CAP_KEY_TTS_CLOUD_AYLIN;
                     break;
                 case 11:
-                    capkey = "tts.cloud.claire";
+                    capkey = ConfigUtil.CAP_KEY_TTS_CLOUD_CLAIRE;
                     break;
                 case 12:
-                    capkey = "tts.cloud.melina";
+                    capkey = ConfigUtil.CAP_KEY_TTS_CLOUD_MELINA;
                     break;
                 case 13:
-                    capkey = "tts.cloud.maged";
+                    capkey = ConfigUtil.CAP_KEY_TTS_CLOUD_MAGED;
                     break;
                 case 14:
-                    capkey = "tts.cloud.javier";
+                    capkey = ConfigUtil.CAP_KEY_TTS_CLOUD_JAVIER;
                     break;
                 case 15:
-                    capkey = "tts.cloud.damayanti";
+                    capkey = ConfigUtil.CAP_KEY_TTS_CLOUD_DAMAYANTI;
                     break;
                 case 16:
-                    capkey = "tts.cloud.xiaojie";
+                    capkey = ConfigUtil.CAP_KEY_TTS_CLOUD_XIAOJIE;
                     break;
                 case 17:
-                    capkey = "tts.cloud.uyghur";
+                    capkey = ConfigUtil.CAP_KEY_TTS_CLOUD_UYGHUR;
                     break;
                 default:
                     break;
@@ -178,7 +225,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
         @Override
         public void onNothingSelected(AdapterView<?> parent) {
-            capkey = "tts.cloud.hui";
+            capkey = ConfigUtil.CAP_KEY_TTS_CLOUD_WANGJING;
         }
     }
 }
